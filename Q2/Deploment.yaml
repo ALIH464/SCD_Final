@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+    initContainers:
+    - name: init-mysqldb
+      image: busybox:latest
+      command: ['sh', '-c', 'tail -f /var/log/shared/app.log']
+limits:
+            memory: "128Mi"
+            cpu: "200m"
+requests:
+            memory: "64Mi"
+            cpu: "100m"
+            containers:
+             - name : backend
+               image: ismailza/mern-stack-app-backend:latest
+            resources:
+            limits:
+            memory: "256Mi"
+            cpu: "500m"
+            requests:
+            memory: "128Mi"
+            cpu: "200m"
+            env:
+            - name: APP_MODE
+              value: "production"
+              -name : DB_USER
+              value : "admin" 
+              ports:
+              - containerPort: 3000
